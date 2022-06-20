@@ -11,6 +11,16 @@
     state: "{{ docker_package_state }}"
   notify: restart docker
   ignore_errors: "{{ ansible_check_mode }}"
+  when: "ansible_version.full is version_compare('2.12', '<') or ansible_os_family not in ['RedHat', 'Debian']"
+
+- name: Install Docker (with downgrade option).
+  package:
+    name: "{{ docker_package }}"
+    state: "{{ docker_package_state }}"
+    allow_downgrade: true
+  notify: restart docker
+  ignore_errors: "{{ ansible_check_mode }}"
+  when: "ansible_version.full is version_compare('2.12', '>=') and ansible_os_family in ['RedHat', 'Debian']"
 
 - name: Ensure /etc/docker/ directory exists.
   file:
